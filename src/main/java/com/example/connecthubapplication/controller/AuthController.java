@@ -1,5 +1,6 @@
 package com.example.connecthubapplication.controller;
 
+import com.example.connecthubapplication.dto.AuthResponse;
 import com.example.connecthubapplication.dto.LoginRequest;
 import com.example.connecthubapplication.dto.RegisterRequest;
 import com.example.connecthubapplication.entity.User;
@@ -55,7 +56,7 @@ public class AuthController {
 
     // LOGIN
     @PostMapping("/login")
-    public String login(
+    public AuthResponse login(
             @RequestBody LoginRequest request
     ) {
 
@@ -71,12 +72,17 @@ public class AuthController {
         );
 
         if (!matches) {
-
-            return "Invalid Password";
+            throw new RuntimeException("Invalid Password");
         }
 
-        return jwtUtil.generateToken(
+        String token = jwtUtil.generateToken(
                 user.getEmail()
+        );
+
+        return new AuthResponse(
+                token,
+                user.getRole(),
+                user.getFullName()
         );
     }
 }
